@@ -1,0 +1,3 @@
+# Edelstein.Tools.AlbumDownloader
+
+TBD
