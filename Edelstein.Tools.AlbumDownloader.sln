@@ -1,6 +1,6 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edelstein.Tools.AlbumDownloader", "Edelstein.Tools.AlbumDownloader\Edelstein.Tools.AlbumDownloader.csproj", "{1D170D02-2030-442E-AD40-18BFF3D684C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edelstein.Tools.AlbumDownloader", "src\Edelstein.Tools.AlbumDownloader\Edelstein.Tools.AlbumDownloader.csproj", "{1D170D02-2030-442E-AD40-18BFF3D684C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
