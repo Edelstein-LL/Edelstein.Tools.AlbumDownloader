@@ -157,6 +157,7 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
     HttpClient httpClient = new();
 
     await AnsiConsole.Progress()
+        .AutoClear(true)
         .HideCompleted(true)
         .StartAsync(async context =>
         {
@@ -222,6 +223,7 @@ async Task ExtractAlbum(string inputDir, string outputDir)
     Directory.CreateDirectory(outputDir);
 
     await AnsiConsole.Live(new Text("Initializing..."))
+        .AutoClear(true)
         .StartAsync(async liveDisplayContext =>
         {
             long totalFileCount = Directory.EnumerateFiles(inputDir, "*.zip", SearchOption.AllDirectories).Count() + 1;
@@ -290,6 +292,7 @@ async Task ConvertAlbum(string inputDir, string outputDir)
     Directory.CreateDirectory(outputDir);
 
     await AnsiConsole.Live(new Text("Initializing..."))
+        .AutoClear(true)
         .StartAsync(async liveDisplayContext =>
         {
             long totalFileCount = Directory.EnumerateFiles(inputDir, "*.astc", SearchOption.AllDirectories).Count() + 1;
