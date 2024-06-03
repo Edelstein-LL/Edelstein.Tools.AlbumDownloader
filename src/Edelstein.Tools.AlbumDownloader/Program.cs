@@ -13,52 +13,71 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-Option<DownloadScheme> downloadSchemeOption =
-    new(["--scheme", "-s"], () => DownloadScheme.Jp, "Download scheme used by the tool (Global or Jp)");
-Option<string> downloadMstDirOption = new(["--mst-dir", "-m"], () => ".", "Folder with AlbumUnitMMst.json and AlbumSeriesMMst.json");
-Option<string> downloadOutputOption = new(["--output-dir", "-o"], () => "album", "Target directory for downloaded files");
-Option<int> parallelDownloadsCountOption = new(["--parallel-downloads", "-p"], () => 10, "Count of parallel downloads");
-Option<string?> albumHostOption = new("--album-host", () => null, "Host of album storage");
-Option<bool> httpOption = new("--http", () => false, "Use plain HTTP instead of HTTPS");
-
-Command downloadCommand = new("download", "Downloads album")
-{
-    downloadSchemeOption,
-    downloadMstDirOption,
-    downloadOutputOption,
-    parallelDownloadsCountOption,
-    albumHostOption,
-    httpOption
-};
-downloadCommand.AddAlias("d");
-downloadCommand.SetHandler(DownloadAlbum, downloadSchemeOption, downloadMstDirOption, downloadOutputOption, parallelDownloadsCountOption,
-    albumHostOption, httpOption);
-
-Option<string> extractionInputOption = new(["--input-dir", "-i"], () => "album", "Folder with original files");
-Option<string> extractionOutputOption = new(["--output-dir", "-o"], () => "album-extracted", "Target folder for extracted files");
-
-Command extractCommand = new("extract", "Extracts all album archives")
-{
-    extractionInputOption,
-    extractionOutputOption
-};
-extractCommand.AddAlias("x");
-extractCommand.SetHandler(ExtractAlbum, extractionInputOption, extractionOutputOption);
-
-Option<string> conversionInputOption = new(["--input-dir", "-i"], () => "album-extracted", "Folder with extracted files");
-Option<string> conversionOutputOption = new(["--output-dir", "-o"], () => "album-converted", "Target folder for converted files");
-
-Command convertCommand = new("convert", "Converts all .astc files to .png")
-{
-    conversionInputOption,
-    conversionOutputOption
-};
-convertCommand.AddAlias("c");
-convertCommand.SetHandler(ConvertAlbum, conversionInputOption, conversionOutputOption);
+Command downloadCommand = ConfigureDownloadCommand();
+Command extractCommand = ConfigureExtractCommand();
+Command convertCommand = ConfigureConvertCommand();
 
 RootCommand rootCommand = [downloadCommand, extractCommand, convertCommand];
 
 return await rootCommand.InvokeAsync(args);
+
+Command ConfigureDownloadCommand()
+{
+    Option<DownloadScheme> downloadSchemeOption =
+        new(["--scheme", "-s"], () => DownloadScheme.Jp, "Download scheme used by the tool (Global or Jp)");
+    Option<string> mstDirOption = new(["--mst-dir", "-m"], () => ".", "Folder with AlbumUnitMMst.json and AlbumSeriesMMst.json");
+    Option<string> outputOption = new(["--output-dir", "-o"], () => "album", "Target directory for downloaded files");
+    Option<int> parallelDownloadsCountOption = new(["--parallel-downloads", "-p"], () => 10, "Count of parallel downloads");
+    Option<string?> albumHostOption = new("--album-host", () => null, "Host of album storage");
+    Option<bool> httpOption = new("--http", () => false, "Use plain HTTP instead of HTTPS");
+
+    Command downloadCommand = new("download", "Downloads album")
+    {
+        downloadSchemeOption,
+        mstDirOption,
+        outputOption,
+        parallelDownloadsCountOption,
+        albumHostOption,
+        httpOption
+    };
+    downloadCommand.AddAlias("d");
+    downloadCommand.SetHandler(DownloadAlbum, downloadSchemeOption, mstDirOption, outputOption, parallelDownloadsCountOption,
+        albumHostOption, httpOption);
+
+    return downloadCommand;
+}
+
+Command ConfigureExtractCommand()
+{
+    Option<string> inputOption = new(["--input-dir", "-i"], () => "album", "Folder with original files");
+    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-extracted", "Target folder for extracted files");
+
+    Command extractCommand = new("extract", "Extracts all album archives")
+    {
+        inputOption,
+        outputOption
+    };
+    extractCommand.AddAlias("x");
+    extractCommand.SetHandler(ExtractAlbum, inputOption, outputOption);
+
+    return extractCommand;
+}
+
+Command ConfigureConvertCommand()
+{
+    Option<string> inputOption = new(["--input-dir", "-i"], () => "album-extracted", "Folder with extracted files");
+    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-converted", "Target folder for converted files");
+
+    Command convertCommand = new("convert", "Converts all .astc files to .png")
+    {
+        inputOption,
+        outputOption
+    };
+    convertCommand.AddAlias("c");
+    convertCommand.SetHandler(ConvertAlbum, inputOption, outputOption);
+
+    return convertCommand;
+}
 
 async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string downloadPath, int parallelDownloadsCount, string? albumHost, bool http)
 {
