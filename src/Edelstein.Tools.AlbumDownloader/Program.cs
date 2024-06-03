@@ -17,6 +17,7 @@ Option<DownloadScheme> downloadSchemeOption =
     new(["--scheme", "-s"], () => DownloadScheme.Jp, "Download scheme used by the tool (Global or Jp)");
 Option<string> downloadMstDirOption = new(["--mst-dir", "-m"], () => ".", "Folder with AlbumUnitMMst.json and AlbumSeriesMMst.json");
 Option<string> downloadOutputOption = new(["--output-dir", "-o"], () => "album", "Target directory for downloaded files");
+Option<int> parallelDownloadsCountOption = new(["--parallel-downloads", "-p"], () => 10, "Count of parallel downloads");
 Option<string?> albumHostOption = new("--album-host", () => null, "Host of album storage");
 Option<bool> httpOption = new("--http", () => false, "Use plain HTTP instead of HTTPS");
 
@@ -25,12 +26,13 @@ Command downloadCommand = new("download", "Downloads album")
     downloadSchemeOption,
     downloadMstDirOption,
     downloadOutputOption,
+    parallelDownloadsCountOption,
     albumHostOption,
     httpOption
 };
 downloadCommand.AddAlias("d");
-downloadCommand.SetHandler(DownloadAlbum, downloadSchemeOption, downloadMstDirOption, downloadOutputOption, albumHostOption,
-    httpOption);
+downloadCommand.SetHandler(DownloadAlbum, downloadSchemeOption, downloadMstDirOption, downloadOutputOption, parallelDownloadsCountOption,
+    albumHostOption, httpOption);
 
 Option<string> extractionInputOption = new(["--input-dir", "-i"], () => "album", "Folder with original files");
 Option<string> extractionOutputOption = new(["--output-dir", "-o"], () => "album-extracted", "Target folder for extracted files");
@@ -58,7 +60,7 @@ RootCommand rootCommand = [downloadCommand, extractCommand, convertCommand];
 
 return await rootCommand.InvokeAsync(args);
 
-async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string downloadPath, string? albumHost, bool http)
+async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string downloadPath, int parallelDownloadsCount, string? albumHost, bool http)
 {
     const string defaultJpHost = "lovelive-schoolidolfestival2-album.akamaized.net";
     const string defaultGlHost = "album-sif2.lovelive-sif2.com";
@@ -139,7 +141,7 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
         .HideCompleted(true)
         .StartAsync(async context =>
         {
-            SemaphoreSlim semaphoreSlim = new(10);
+            SemaphoreSlim semaphoreSlim = new(parallelDownloadsCount);
             bool isPausedGlobally = false;
 
             ProgressTask globalProgressTask = context.AddTask("Global progress", true, allFilesUris.Count);
