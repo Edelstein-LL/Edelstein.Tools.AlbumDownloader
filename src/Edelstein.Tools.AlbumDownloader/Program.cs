@@ -159,6 +159,13 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
     await AnsiConsole.Progress()
         .AutoClear(true)
         .HideCompleted(true)
+        .Columns([
+            new TaskDescriptionColumn(),
+            new ProgressBarColumn(),
+            new PercentageColumn(),
+            new RemainingTimeColumn(),
+            new SpinnerColumn()
+        ])
         .StartAsync(async context =>
         {
             SemaphoreSlim semaphoreSlim = new(parallelDownloadsCount);
