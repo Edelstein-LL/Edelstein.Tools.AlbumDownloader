@@ -25,7 +25,7 @@ Command ConfigureDownloadCommand()
 {
     Option<DownloadScheme> downloadSchemeOption =
         new(["--scheme", "-s"], () => DownloadScheme.Jp, "Download scheme used by the tool (Global or Jp)");
-    Option<string> mstDirOption = new(["--mst-dir", "-m"], () => ".", "Folder with AlbumUnitMMst.json and AlbumSeriesMMst.json");
+    Option<string> mstDirOption = new(["--mst-dir", "-m"], () => ".", "Directory with AlbumUnitMMst.json and AlbumSeriesMMst.json");
     Option<string> outputOption = new(["--output-dir", "-o"], () => "album", "Target directory for downloaded files");
     Option<int> parallelDownloadsCountOption = new(["--parallel-downloads", "-p"], () => 10, "Count of parallel downloads");
     Option<string?> albumHostOption = new("--album-host", () => null, "Host of album storage");
@@ -49,8 +49,8 @@ Command ConfigureDownloadCommand()
 
 Command ConfigureExtractCommand()
 {
-    Option<string> inputOption = new(["--input-dir", "-i"], () => "album", "Folder with original files");
-    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-extracted", "Target folder for extracted files");
+    Option<string> inputOption = new(["--input-dir", "-i"], () => "album", "Directory with original files");
+    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-extracted", "Target directory for extracted files");
 
     Command extractCommand = new("extract", "Extracts all album archives")
     {
@@ -65,8 +65,8 @@ Command ConfigureExtractCommand()
 
 Command ConfigureConvertCommand()
 {
-    Option<string> inputOption = new(["--input-dir", "-i"], () => "album-extracted", "Folder with extracted files");
-    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-converted", "Target folder for converted files");
+    Option<string> inputOption = new(["--input-dir", "-i"], () => "album-extracted", "Directory with extracted files");
+    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-converted", "Target directory for converted files");
 
     Command convertCommand = new("convert", "Converts all .astc files to .png")
     {
