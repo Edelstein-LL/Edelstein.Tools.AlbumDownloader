@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <Authors>Arasfon</Authors>
         <Copyright>Copyright 2024 © Arasfon</Copyright>
+        <Version>1.1.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
