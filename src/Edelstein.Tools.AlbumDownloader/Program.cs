@@ -322,10 +322,16 @@ async Task ConvertAlbum(string inputDir, string outputDir)
                 {
                     Arguments = $"-ds \"{filePath}\" \"{Path.Combine(fileOutputDir, Path.GetFileNameWithoutExtension(filePath))}.png\"",
                     FileName = astcencPath,
-                    RedirectStandardOutput = true
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
                 };
 
                 Process process = Process.Start(processStartInfo)!;
+
+                await process.StandardOutput.ReadToEndAsync();
+                await process.StandardError.ReadToEndAsync();
 
                 await process.WaitForExitAsync();
 
