@@ -233,10 +233,11 @@ async Task ExtractAlbum(string inputDir, string outputDir)
         .AutoClear(true)
         .StartAsync(async liveDisplayContext =>
         {
-            long totalFileCount = Directory.EnumerateFiles(inputDir, "*.zip", SearchOption.AllDirectories).Count() + 1;
+            List<string> filePaths = Directory.EnumerateFiles(inputDir, "*.zip", SearchOption.AllDirectories).ToList();
+            long totalFileCount = filePaths.Count + 1;
             long currentFileNumber = 1;
 
-            foreach (string filePath in Directory.EnumerateFiles(inputDir, "*.zip", SearchOption.AllDirectories))
+            foreach (string filePath in filePaths)
             {
                 string relativePath = Path.GetRelativePath(inputDir, filePath);
                 string fileOutputDir = Path.Combine(outputDir, Path.GetDirectoryName(relativePath)!,
@@ -302,10 +303,11 @@ async Task ConvertAlbum(string inputDir, string outputDir)
         .AutoClear(true)
         .StartAsync(async liveDisplayContext =>
         {
-            long totalFileCount = Directory.EnumerateFiles(inputDir, "*.astc", SearchOption.AllDirectories).Count() + 1;
+            List<string> filePaths = Directory.EnumerateFiles(inputDir, "*.astc", SearchOption.AllDirectories).ToList();
+            long totalFileCount = filePaths.Count + 1;
             long currentFileNumber = 1;
 
-            foreach (string filePath in Directory.EnumerateFiles(inputDir, "*.astc", SearchOption.AllDirectories))
+            foreach (string filePath in filePaths)
             {
                 string relativePath = Path.GetRelativePath(inputDir, filePath);
                 string fileOutputDir = Path.Combine(outputDir, Path.GetDirectoryName(relativePath)!);
