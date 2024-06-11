@@ -14,7 +14,7 @@ This program requires the [.NET 8.0 runtime](https://dotnet.microsoft.com/en-us/
 
 Download respective [latest release](https://github.com/Edelstein-LL/Edelstein.Tools.AlbumDownloader/releases/latest) executable for your OS and architecture.
 
-If you need `.astc` conversion, download [astcenc](https://github.com/ARM-software/astc-encoder) for your OS and architecture and extract the files from the bin folder to the folder where you downloaded AlbumDownloader.
+If you need `.astc` conversion, download [astcenc](https://github.com/ARM-software/astc-encoder) for your OS and architecture and extract the files from the bin directory to the directory where you downloaded AlbumDownloader.
 
 ## Usage
 
@@ -31,17 +31,17 @@ Every command have respective `--help`/`-h`/`-?` option to display help about th
 
 - `download` (`d`) — Downloads album
   - `-s, --scheme <Global|Jp>`                       Download scheme used by the tool (Global or Jp) [default: `Jp`]
-  - `-m, --mst-dir <mst-dir>`                        Folder with AlbumUnitMMst.json and AlbumSeriesMMst.json [default: `.`]
+  - `-m, --mst-dir <mst-dir>`                        Directory with AlbumUnitMMst.json and AlbumSeriesMMst.json [default: `.`]
   - `-o, --output-dir <output-dir>`                  Target directory for downloaded files [default: `album`]
   - `-p, --parallel-downloads <parallel-downloads>`  Count of parallel downloads [default: `10`]
   - `--album-host <album-host>`                      Host of album storage []
   - `--http`                                         Use plain HTTP instead of HTTPS [default: `False`]
 - `extract` (`x`) — Extracts all album archives
-  - `-i, --input-dir <input-dir>`    Folder with original files [default: `album`]
-  - `-o, --output-dir <output-dir>`  Target folder for extracted files [default: `album-extracted`]
+  - `-i, --input-dir <input-dir>`    Directory with original files [default: `album`]
+  - `-o, --output-dir <output-dir>`  Target directory for extracted files [default: `album-extracted`]
 - `convert` (`c`) — Converts all `.astc` files to `.png`
-  - `-i, --input-dir <input-dir>`    Folder with extracted files [default: `album-extracted`]
-  - `-o, --output-dir <output-dir>`  Target folder for converted files [default: `album-converted`]
+  - `-i, --input-dir <input-dir>`    Directory with extracted files [default: `album-extracted`]
+  - `-o, --output-dir <output-dir>`  Target directory for converted files [default: `album-converted`]
 
 ## License
 
