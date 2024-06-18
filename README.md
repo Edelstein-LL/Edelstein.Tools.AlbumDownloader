@@ -10,7 +10,7 @@ It can:
 
 ## Install
 
-This program requires the [.NET 8.0 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) to run and optionally [astcenc](https://github.com/ARM-software/astc-encoder) to convert `.astc` to `.png`.
+This program requires the [.NET 8.0 runtime](https://dot.net/download) to run and optionally [astcenc](https://github.com/ARM-software/astc-encoder) to convert `.astc` to `.png`.
 
 Download respective [latest release](https://github.com/Edelstein-LL/Edelstein.Tools.AlbumDownloader/releases/latest) executable for your OS and architecture.
 
