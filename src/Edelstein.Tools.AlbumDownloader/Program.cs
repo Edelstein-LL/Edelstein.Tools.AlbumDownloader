@@ -79,7 +79,8 @@ Command ConfigureConvertCommand()
     return convertCommand;
 }
 
-async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string downloadPath, int parallelDownloadsCount, string? albumHost, bool http)
+async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string downloadPath, int parallelDownloadsCount, string? albumHost,
+    bool http)
 {
     const string defaultJpHost = "lovelive-schoolidolfestival2-album.akamaized.net";
     const string defaultGlHost = "album-sif2.lovelive-sif2.com";
@@ -159,13 +160,8 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
     await AnsiConsole.Progress()
         .AutoClear(true)
         .HideCompleted(true)
-        .Columns([
-            new TaskDescriptionColumn(),
-            new ProgressBarColumn(),
-            new PercentageColumn(),
-            new RemainingTimeColumn(),
-            new SpinnerColumn()
-        ])
+        .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new RemainingTimeColumn(),
+            new SpinnerColumn())
         .StartAsync(async context =>
         {
             SemaphoreSlim semaphoreSlim = new(parallelDownloadsCount);
@@ -250,7 +246,7 @@ async Task ExtractAlbum(string inputDir, string outputDir)
                 zipInputStream.Password = GenerateAlbumArchiveKey(filePath);
 
                 Tree liveStatusTree = new(new TextPath(relativePath));
-                Rows rows = new([Markup.FromInterpolated($"Processing [green]({currentFileNumber}/{totalFileCount})[/]:"), liveStatusTree]);
+                Rows rows = new(Markup.FromInterpolated($"Processing [green]({currentFileNumber}/{totalFileCount})[/]:"), liveStatusTree);
                 liveDisplayContext.UpdateTarget(rows);
 
                 while (zipInputStream.GetNextEntry() is { } entry)
@@ -313,9 +309,8 @@ async Task ConvertAlbum(string inputDir, string outputDir)
                 string fileOutputDir = Path.Combine(outputDir, Path.GetDirectoryName(relativePath)!);
                 Directory.CreateDirectory(fileOutputDir);
 
-                Rows rows = new([
-                    Markup.FromInterpolated($"Processing [green]({currentFileNumber}/{totalFileCount})[/]:"), new TextPath(relativePath)
-                ]);
+                Rows rows = new(Markup.FromInterpolated($"Processing [green]({currentFileNumber}/{totalFileCount})[/]:"),
+                    new TextPath(relativePath));
                 liveDisplayContext.UpdateTarget(rows);
 
                 ProcessStartInfo processStartInfo = new()
