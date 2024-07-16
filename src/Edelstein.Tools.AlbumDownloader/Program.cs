@@ -79,7 +79,7 @@ Command ConfigureConvertCommand()
     return convertCommand;
 }
 
-async Task DownloadAlbum(DownloadScheme downloadScheme, DirectoryInfo mstDir, DirectoryInfo downloadDir, int parallelDownloadsCount, string? albumHost,
+static async Task DownloadAlbum(DownloadScheme downloadScheme, DirectoryInfo mstDir, DirectoryInfo downloadDir, int parallelDownloadsCount, string? albumHost,
     bool http)
 {
     const string defaultJpHost = "lovelive-schoolidolfestival2-album.akamaized.net";
@@ -221,7 +221,7 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, DirectoryInfo mstDir, Di
     Console.ReadKey();
 }
 
-async Task ExtractAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
+static async Task ExtractAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
 {
     outputDir.Create();
 
@@ -280,14 +280,14 @@ async Task ExtractAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
     Console.ReadKey();
 }
 
-string GenerateAlbumArchiveKey(string filePath)
+static string GenerateAlbumArchiveKey(string filePath)
 {
     string fileName = Path.GetFileName(filePath);
 
     return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"sif2_{fileName}_album"))).ToLowerInvariant();
 }
 
-async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
+static async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
 {
     string? astcencPath = SearchAstcenc();
     if (astcencPath is null)
@@ -347,7 +347,7 @@ async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
     Console.ReadKey();
 }
 
-string? SearchAstcenc()
+static string? SearchAstcenc()
 {
     switch (RuntimeInformation.ProcessArchitecture)
     {
