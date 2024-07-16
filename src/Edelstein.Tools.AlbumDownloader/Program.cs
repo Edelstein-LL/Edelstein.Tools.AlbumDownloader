@@ -25,8 +25,10 @@ Command ConfigureDownloadCommand()
 {
     Option<DownloadScheme> downloadSchemeOption =
         new(["--scheme", "-s"], () => DownloadScheme.Jp, "Download scheme used by the tool (Global or Jp)");
-    Option<DirectoryInfo> mstDirOption = new(["--mst-dir", "-m"], () => new DirectoryInfo("."), "Directory with AlbumUnitMMst.json and AlbumSeriesMMst.json");
-    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album"), "Target directory for downloaded files");
+    Option<DirectoryInfo> mstDirOption = new(["--mst-dir", "-m"], () => new DirectoryInfo("."),
+        "Directory with AlbumUnitMMst.json and AlbumSeriesMMst.json");
+    Option<DirectoryInfo> outputDirOption =
+        new(["--output-dir", "-o"], () => new DirectoryInfo("album"), "Target directory for downloaded files");
     Option<int> parallelDownloadsCountOption = new(["--parallel-downloads", "-p"], () => 10, "Count of parallel downloads");
     Option<string?> albumHostOption = new("--album-host", () => null, "Host of album storage");
     Option<bool> httpOption = new("--http", () => false, "Use plain HTTP instead of HTTPS");
@@ -50,7 +52,8 @@ Command ConfigureDownloadCommand()
 Command ConfigureExtractCommand()
 {
     Option<DirectoryInfo> inputDirOption = new(["--input-dir", "-i"], () => new DirectoryInfo("album"), "Directory with original files");
-    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album-extracted"), "Target directory for extracted files");
+    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album-extracted"),
+        "Target directory for extracted files");
 
     Command extractCommand = new("extract", "Extracts all album archives")
     {
@@ -65,8 +68,10 @@ Command ConfigureExtractCommand()
 
 Command ConfigureConvertCommand()
 {
-    Option<DirectoryInfo> inputDirOption = new(["--input-dir", "-i"], () => new DirectoryInfo("album-extracted"), "Directory with extracted files");
-    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album-converted"), "Target directory for converted files");
+    Option<DirectoryInfo> inputDirOption =
+        new(["--input-dir", "-i"], () => new DirectoryInfo("album-extracted"), "Directory with extracted files");
+    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album-converted"),
+        "Target directory for converted files");
 
     Command convertCommand = new("convert", "Converts all .astc files to .png")
     {
@@ -79,7 +84,8 @@ Command ConfigureConvertCommand()
     return convertCommand;
 }
 
-static async Task DownloadAlbum(DownloadScheme downloadScheme, DirectoryInfo mstDir, DirectoryInfo downloadDir, int parallelDownloadsCount, string? albumHost,
+static async Task DownloadAlbum(DownloadScheme downloadScheme, DirectoryInfo mstDir, DirectoryInfo downloadDir, int parallelDownloadsCount,
+    string? albumHost,
     bool http)
 {
     const string defaultJpHost = "lovelive-schoolidolfestival2-album.akamaized.net";
