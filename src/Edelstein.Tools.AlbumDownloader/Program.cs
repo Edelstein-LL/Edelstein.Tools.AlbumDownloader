@@ -293,11 +293,11 @@ static string GenerateAlbumArchiveKey(string filePath)
     return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"sif2_{fileName}_album"))).ToLowerInvariant();
 }
 
-static async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
+static async Task<int> ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
 {
     string? astcencPath = SearchAstcenc();
     if (astcencPath is null)
-        return;
+        return 1;
 
     outputDir.Create();
 
@@ -339,7 +339,7 @@ static async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
                 if (process.ExitCode != 0)
                 {
                     AnsiConsole.Markup("[red]Something went wrong...[/]");
-                    return;
+                    throw new Exception($"Child process exited with code {process.ExitCode}");
                 }
 
                 currentFileNumber++;
@@ -351,6 +351,8 @@ static async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
     AnsiConsole.WriteLine("Success!");
     AnsiConsole.WriteLine("Press any key to exit...");
     Console.ReadKey();
+
+    return 0;
 }
 
 static string? SearchAstcenc()
