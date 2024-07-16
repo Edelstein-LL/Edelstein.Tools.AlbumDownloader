@@ -25,8 +25,8 @@ Command ConfigureDownloadCommand()
 {
     Option<DownloadScheme> downloadSchemeOption =
         new(["--scheme", "-s"], () => DownloadScheme.Jp, "Download scheme used by the tool (Global or Jp)");
-    Option<string> mstDirOption = new(["--mst-dir", "-m"], () => ".", "Directory with AlbumUnitMMst.json and AlbumSeriesMMst.json");
-    Option<string> outputOption = new(["--output-dir", "-o"], () => "album", "Target directory for downloaded files");
+    Option<DirectoryInfo> mstDirOption = new(["--mst-dir", "-m"], () => new DirectoryInfo("."), "Directory with AlbumUnitMMst.json and AlbumSeriesMMst.json");
+    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album"), "Target directory for downloaded files");
     Option<int> parallelDownloadsCountOption = new(["--parallel-downloads", "-p"], () => 10, "Count of parallel downloads");
     Option<string?> albumHostOption = new("--album-host", () => null, "Host of album storage");
     Option<bool> httpOption = new("--http", () => false, "Use plain HTTP instead of HTTPS");
@@ -35,13 +35,13 @@ Command ConfigureDownloadCommand()
     {
         downloadSchemeOption,
         mstDirOption,
-        outputOption,
+        outputDirOption,
         parallelDownloadsCountOption,
         albumHostOption,
         httpOption
     };
     downloadCommand.AddAlias("d");
-    downloadCommand.SetHandler(DownloadAlbum, downloadSchemeOption, mstDirOption, outputOption, parallelDownloadsCountOption,
+    downloadCommand.SetHandler(DownloadAlbum, downloadSchemeOption, mstDirOption, outputDirOption, parallelDownloadsCountOption,
         albumHostOption, httpOption);
 
     return downloadCommand;
@@ -49,37 +49,37 @@ Command ConfigureDownloadCommand()
 
 Command ConfigureExtractCommand()
 {
-    Option<string> inputOption = new(["--input-dir", "-i"], () => "album", "Directory with original files");
-    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-extracted", "Target directory for extracted files");
+    Option<DirectoryInfo> inputDirOption = new(["--input-dir", "-i"], () => new DirectoryInfo("album"), "Directory with original files");
+    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album-extracted"), "Target directory for extracted files");
 
     Command extractCommand = new("extract", "Extracts all album archives")
     {
-        inputOption,
-        outputOption
+        inputDirOption,
+        outputDirOption
     };
     extractCommand.AddAlias("x");
-    extractCommand.SetHandler(ExtractAlbum, inputOption, outputOption);
+    extractCommand.SetHandler(ExtractAlbum, inputDirOption, outputDirOption);
 
     return extractCommand;
 }
 
 Command ConfigureConvertCommand()
 {
-    Option<string> inputOption = new(["--input-dir", "-i"], () => "album-extracted", "Directory with extracted files");
-    Option<string> outputOption = new(["--output-dir", "-o"], () => "album-converted", "Target directory for converted files");
+    Option<DirectoryInfo> inputDirOption = new(["--input-dir", "-i"], () => new DirectoryInfo("album-extracted"), "Directory with extracted files");
+    Option<DirectoryInfo> outputDirOption = new(["--output-dir", "-o"], () => new DirectoryInfo("album-converted"), "Target directory for converted files");
 
     Command convertCommand = new("convert", "Converts all .astc files to .png")
     {
-        inputOption,
-        outputOption
+        inputDirOption,
+        outputDirOption
     };
     convertCommand.AddAlias("c");
-    convertCommand.SetHandler(ConvertAlbum, inputOption, outputOption);
+    convertCommand.SetHandler(ConvertAlbum, inputDirOption, outputDirOption);
 
     return convertCommand;
 }
 
-async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string downloadPath, int parallelDownloadsCount, string? albumHost,
+async Task DownloadAlbum(DownloadScheme downloadScheme, DirectoryInfo mstDir, DirectoryInfo downloadDir, int parallelDownloadsCount, string? albumHost,
     bool http)
 {
     const string defaultJpHost = "lovelive-schoolidolfestival2-album.akamaized.net";
@@ -114,7 +114,7 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
             throw new ArgumentOutOfRangeException(nameof(downloadScheme), downloadScheme, null);
     }
 
-    Directory.CreateDirectory(downloadPath);
+    downloadDir.Create();
 
     JsonSerializerOptions defaultJsonSerializationOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
@@ -125,12 +125,12 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
 
     Console.WriteLine("Reading msts...");
 
-    using (StreamReader sr = new(Path.Combine(mstDir, "AlbumSeriesMMst.json")))
+    using (StreamReader sr = new(Path.Combine(mstDir.FullName, "AlbumSeriesMMst.json")))
     {
         seriesMsts = JsonSerializer.Deserialize<List<AlbumSeriesMMst>>(sr.ReadToEnd(), defaultJsonSerializationOptions)!;
     }
 
-    using (StreamReader sr = new(Path.Combine(mstDir, "AlbumUnitMMst.json")))
+    using (StreamReader sr = new(Path.Combine(mstDir.FullName, "AlbumUnitMMst.json")))
     {
         unitMsts = JsonSerializer.Deserialize<List<AlbumUnitMMst>>(sr.ReadToEnd(), defaultJsonSerializationOptions)!;
     }
@@ -192,9 +192,9 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
 
                     await using Stream httpStream = await response.Content.ReadAsStreamAsync();
 
-                    Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(downloadPath, uri.AbsolutePath[1..]))!);
+                    Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(downloadDir.FullName, uri.AbsolutePath[1..]))!);
 
-                    await using StreamWriter fileWriter = new(Path.Combine(downloadPath, uri.AbsolutePath[1..]), false);
+                    await using StreamWriter fileWriter = new(Path.Combine(downloadDir.FullName, uri.AbsolutePath[1..]), false);
 
                     await httpStream.CopyToWithProgressAsync(fileWriter.BaseStream, response.Content.Headers.ContentLength,
                         progressTask);
@@ -221,22 +221,22 @@ async Task DownloadAlbum(DownloadScheme downloadScheme, string mstDir, string do
     Console.ReadKey();
 }
 
-async Task ExtractAlbum(string inputDir, string outputDir)
+async Task ExtractAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
 {
-    Directory.CreateDirectory(outputDir);
+    outputDir.Create();
 
     await AnsiConsole.Live(new Text("Initializing..."))
         .AutoClear(true)
         .StartAsync(async liveDisplayContext =>
         {
-            List<string> filePaths = Directory.EnumerateFiles(inputDir, "*.zip", SearchOption.AllDirectories).ToList();
+            List<string> filePaths = Directory.EnumerateFiles(inputDir.FullName, "*.zip", SearchOption.AllDirectories).ToList();
             long totalFileCount = filePaths.Count + 1;
             long currentFileNumber = 1;
 
             foreach (string filePath in filePaths)
             {
-                string relativePath = Path.GetRelativePath(inputDir, filePath);
-                string fileOutputDir = Path.Combine(outputDir, Path.GetDirectoryName(relativePath)!,
+                string relativePath = Path.GetRelativePath(inputDir.FullName, filePath);
+                string fileOutputDir = Path.Combine(outputDir.FullName, Path.GetDirectoryName(relativePath)!,
                     Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(filePath)));
                 Directory.CreateDirectory(fileOutputDir);
 
@@ -287,26 +287,26 @@ string GenerateAlbumArchiveKey(string filePath)
     return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"sif2_{fileName}_album"))).ToLowerInvariant();
 }
 
-async Task ConvertAlbum(string inputDir, string outputDir)
+async Task ConvertAlbum(DirectoryInfo inputDir, DirectoryInfo outputDir)
 {
     string? astcencPath = SearchAstcenc();
     if (astcencPath is null)
         return;
 
-    Directory.CreateDirectory(outputDir);
+    outputDir.Create();
 
     await AnsiConsole.Live(new Text("Initializing..."))
         .AutoClear(true)
         .StartAsync(async liveDisplayContext =>
         {
-            List<string> filePaths = Directory.EnumerateFiles(inputDir, "*.astc", SearchOption.AllDirectories).ToList();
+            List<string> filePaths = Directory.EnumerateFiles(inputDir.FullName, "*.astc", SearchOption.AllDirectories).ToList();
             long totalFileCount = filePaths.Count + 1;
             long currentFileNumber = 1;
 
             foreach (string filePath in filePaths)
             {
-                string relativePath = Path.GetRelativePath(inputDir, filePath);
-                string fileOutputDir = Path.Combine(outputDir, Path.GetDirectoryName(relativePath)!);
+                string relativePath = Path.GetRelativePath(inputDir.FullName, filePath);
+                string fileOutputDir = Path.Combine(outputDir.FullName, Path.GetDirectoryName(relativePath)!);
                 Directory.CreateDirectory(fileOutputDir);
 
                 Rows rows = new(Markup.FromInterpolated($"Processing [green]({currentFileNumber}/{totalFileCount})[/]:"),
